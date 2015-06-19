@@ -39,8 +39,11 @@ public class InMemoryDatabase {
             wordList.add(new WordCountModel(entry.getKey(), entry.getValue()));
         }
         Collections.sort(wordList, new WordCountSorter());
-        WordCountModel[] models = new WordCountModel[10];
-        models = wordList.subList(0,10).toArray(models);
+
+        System.out.println("hashmap size: "+wordList.size());
+        int listSize = Math.min(wordList.size(), 10);
+        WordCountModel[] models = new WordCountModel[listSize];
+        models = wordList.subList(0,listSize).toArray(models);
         payload.setTopWords(models);
         return payload;
     }

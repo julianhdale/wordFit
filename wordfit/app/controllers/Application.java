@@ -1,9 +1,6 @@
 package controllers;
 
-import models.SaveTextPayload;
-import models.ShouldShowNotification;
-import models.WordCountModel;
-import models.WordCountPayload;
+import models.*;
 import play.*;
 import play.libs.Json;
 import play.mvc.*;
@@ -16,38 +13,35 @@ public class Application extends Controller {
         return ok(index.render("Your new application is ready."));
     }
 
+
+
+
     @BodyParser.Of(BodyParser.Json.class)
     public Result saveWords() {
         SaveTextPayload payload = Json.fromJson(request().body().asJson(), SaveTextPayload.class);
-        if (payload.userId == null) {
+        if (payload.terms == null) {
             return badRequest("Expected a fucking user id");
         }
-        return ok(payload.userId);
+        for(String word: payload.terms) {
+            InMemoryDatabase.getInstance().putWord(word);
+        }
+        return ok();
     }
 
 
     public Result shouldShowNotification() {
-        ShouldShowNotification not = new ShouldShowNotification();
-        not.shouldShow = 0;
-        return  ok(Json.toJson(not));
+        return  ok(Json.toJson(InMemoryDatabase.getInstance().getNotification()));
     }
 
+    @BodyParser.Of(BodyParser.Json.class)
     public Result changeNotification() {
+        ShouldShowNotification not = Json.fromJson(request().body().asJson(), ShouldShowNotification.class);
+        InMemoryDatabase.getInstance().setShouldShowNotification(not);
         return ok();
     }
 
     public Result getWordCounts() {
-        WordCountPayload payload = new WordCountPayload();
-        int[] temp = {12,3,15,17,18,22,7};
-        payload.setTotalWordCount(temp);
-        WordCountModel models[] = {
-                new WordCountModel("Hello", 5),
-                new WordCountModel("Contradiction", 15),
-                new WordCountModel("Coffee", 16),
-                new WordCountModel("Help", 4)
 
-        };
-        payload.setTopWords(models);
-        return ok(Json.toJson(payload));
+        return ok(Json.toJson(InMemoryDatabase.getInstance().getWordCountPayload()));
     }
 }

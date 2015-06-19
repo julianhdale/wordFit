@@ -10,6 +10,7 @@ public class ShouldShowNotification {
     @JsonProperty("shouldShow")
     public int shouldShow;
 
-
+    @JsonProperty("message")
+    public String message;
 
 }

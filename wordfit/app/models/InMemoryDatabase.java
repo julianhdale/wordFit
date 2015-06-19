@@ -1,8 +1,7 @@
 package models;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
 /**
  * Created by juliandale on 6/19/15.
  */
@@ -39,8 +38,9 @@ public class InMemoryDatabase {
         {
             wordList.add(new WordCountModel(entry.getKey(), entry.getValue()));
         }
-        WordCountModel[] models = new WordCountModel[wordList.size()];
-        models = wordList.toArray(models);
+        Collections.sort(wordList, new WordCountSorter());
+        WordCountModel[] models = new WordCountModel[10];
+        models = wordList.subList(0,10).toArray(models);
         payload.setTopWords(models);
         return payload;
     }
@@ -56,4 +56,12 @@ public class InMemoryDatabase {
         }
         return notification;
     }
+
+    public class WordCountSorter implements Comparator<WordCountModel> {
+        @Override
+        public int compare(WordCountModel a, WordCountModel b) {
+            return b.count - a.count;
+        }
+    }
+
 }
